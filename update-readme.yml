@@ -1,0 +1,28 @@
+# workflows
+name: Update README
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour (adjust as needed)
+  workflow_dispatch:  # Allows you to manually trigger the workflow
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2
+
+      - name: Update README with GitHub stats
+        run: |
+          curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            https://github-readme-stats.vercel.app/api/top-langs?username=elifnurturk&count_private=true&layout=donut \
+            > README.md
+
+      - name: Commit updated README
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Update README with new stats"
+          git push
